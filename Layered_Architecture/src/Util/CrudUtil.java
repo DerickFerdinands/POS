@@ -16,7 +16,9 @@ public class CrudUtil {
         }
 
         if(sql.startsWith("SELECT")){
-            return statement.executeQuery();
+            return (T) statement.executeQuery();
+        }else{
+            return (T)(Boolean)(statement.executeUpdate()>=1);
         }
 
     }

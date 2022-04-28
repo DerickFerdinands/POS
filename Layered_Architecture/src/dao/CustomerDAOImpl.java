@@ -1,5 +1,6 @@
 package dao;
 
+import Util.CrudUtil;
 import db.DBConnection;
 import javafx.scene.control.Alert;
 import model.CustomerDTO;
@@ -13,9 +14,8 @@ import java.util.List;
 public class CustomerDAOImpl {
 
     public static ArrayList<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
-        Statement stm = connection.createStatement();
-        ResultSet rst = stm.executeQuery("SELECT * FROM Customer");
+
+        ResultSet rst = CrudUtil.execute("SELECT * FROM Customer");
         ArrayList<CustomerDTO> cusList = new ArrayList<>();
         while (rst.next()) {
             cusList.add(new CustomerDTO(rst.getString(1), rst.getString(2), rst.getString(3)));
@@ -62,7 +62,7 @@ public class CustomerDAOImpl {
             ResultSet rst = connection.createStatement().executeQuery("SELECT id FROM Customer ORDER BY id DESC LIMIT 1;");
             if (rst.next()) {
                 String id = rst.getString("id");
-                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;
+                int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
                 return String.format("C%03d", newCustomerId);
             } else {
                 return "C001";
