@@ -32,19 +32,12 @@ public class CustomerDAOImpl {
     }
 
     public static boolean updateCustomer(String id , String name, String address) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
-        PreparedStatement pstm = connection.prepareStatement();
-        pstm.setString(1, name);
-        pstm.setString(2, address);
-        pstm.setString(3, id);
-        return CrudUtil.execute("UPDATE Customer SET name=?, address=? WHERE id=?")
+        return CrudUtil.execute("UPDATE Customer SET name=?, address=? WHERE id=?",name,address,id);
     }
 
     public static boolean CustomerExists(String id) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
-        PreparedStatement pstm = connection.prepareStatement("SELECT id FROM Customer WHERE id=?");
-        pstm.setString(1, id);
-        return pstm.executeQuery().next();
+        ResultSet result = (ResultSet) CrudUtil.execute("SELECT id FROM Customer WHERE id=?",id);
+        return result.next();
     }
 
     public static String generateNewId(){
