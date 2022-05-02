@@ -23,24 +23,24 @@ public class CustomerDAOImpl {
     }
 
     public static boolean saveCustomer(String id, String name, String address) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("INSERT INTO Customer (id,name, address) VALUES (?,?,?)",id,name,address);
+        return CrudUtil.execute("INSERT INTO Customer (id,name, address) VALUES (?,?,?)", id, name, address);
     }
 
     public static boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("DELETE FROM Customer WHERE id=?",id);
+        return CrudUtil.execute("DELETE FROM Customer WHERE id=?", id);
 
     }
 
-    public static boolean updateCustomer(String id , String name, String address) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("UPDATE Customer SET name=?, address=? WHERE id=?",name,address,id);
+    public static boolean updateCustomer(String id, String name, String address) throws SQLException, ClassNotFoundException {
+        return CrudUtil.execute("UPDATE Customer SET name=?, address=? WHERE id=?", name, address, id);
     }
 
     public static boolean CustomerExists(String id) throws SQLException, ClassNotFoundException {
-        ResultSet result = (ResultSet) CrudUtil.execute("SELECT id FROM Customer WHERE id=?",id);
+        ResultSet result = CrudUtil.execute("SELECT id FROM Customer WHERE id=?", id);
         return result.next();
     }
 
-    public static String generateNewId(){
+    public static String generateNewId() {
         try {
 
             ResultSet rst = CrudUtil.execute("SELECT id FROM Customer ORDER BY id DESC LIMIT 1");
@@ -67,5 +67,20 @@ public class CustomerDAOImpl {
         } else {
             return null;
         }
+    }
+
+    public static ArrayList<String> getAllCustomerIds() throws SQLException, ClassNotFoundException {
+        ResultSet result = CrudUtil.execute("SELECT id FROM Customer");
+        ArrayList<String> CustomerIds = new ArrayList<>();
+        while (result.next()) {
+            CustomerIds.add(result.getString(1));
+        }
+        return CustomerIds;
+    }
+
+    public static CustomerDTO getCustomer(String id) throws SQLException, ClassNotFoundException {
+        ResultSet result = CrudUtil.execute("SELECT * FROM Customer WHERE id =?", id);
+
+        return result.next() ? new CustomerDTO(result.getString(1), result.getString(2), result.getString(3)) : null;
     }
 }

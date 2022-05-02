@@ -174,10 +174,11 @@ public class ManageItemsFormController {
             try {
                 if (existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
+                }else {
+                    //Save Item
+                    ItemDAOImpl.saveItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
+                    loadAllItems();
                 }
-                //Save Item
-                ItemDAOImpl.saveItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
-
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
             } catch (ClassNotFoundException e) {

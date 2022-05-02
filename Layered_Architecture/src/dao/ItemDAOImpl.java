@@ -16,29 +16,30 @@ public class ItemDAOImpl {
     public static ArrayList<ItemDTO> getALlItems() throws SQLException, ClassNotFoundException {
         ResultSet result = CrudUtil.execute("SELECT * FROM Item");
         ArrayList<ItemDTO> ItemList = new ArrayList<>();
-        while(result.next()){
-            ItemList.add(new ItemDTO(result.getString(1),result.getString(2),result.getBigDecimal(3),result.getInt(4)));
+        while (result.next()) {
+            ItemList.add(new ItemDTO(result.getString(1), result.getString(2), result.getBigDecimal(3), result.getInt(4)));
         }
         return ItemList;
     }
 
     public static boolean deleteItem(String id) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("DELETE FROM Item WHERE code=?",id);
+        return CrudUtil.execute("DELETE FROM Item WHERE code=?", id);
     }
 
     public static boolean saveItem(ItemDTO item) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)",item.getCode(),item.getDescription(),item.getUnitPrice(),item.getQtyOnHand());
+        return CrudUtil.execute("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)", item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand());
     }
 
     public static boolean updateItem(String desc, BigDecimal unitPrice, int qtyOnHand, String code) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?",desc,unitPrice,qtyOnHand,code);
+        return CrudUtil.execute("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?", desc, unitPrice, qtyOnHand, code);
     }
 
     public static boolean itemExists(String code) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("SELECT code FROM Item WHERE code=?",code);
+        ResultSet result = CrudUtil.execute("SELECT code FROM Item WHERE code=?", code);
+        return result.next();
     }
 
-    public static String generateNewId(){
+    public static String generateNewId() {
         try {
             ResultSet rst = CrudUtil.execute("SELECT code FROM Item ORDER BY code DESC LIMIT 1");
             if (rst.next()) {
@@ -55,4 +56,25 @@ public class ItemDAOImpl {
         }
         return "P001";
     }
+
+    public static ItemDTO getItem(String code) throws SQLException, ClassNotFoundException {
+        ResultSet result = CrudUtil.execute("SELECT * FROM Item WHERE code=?", code);
+
+        if (result.next()) {
+            return new ItemDTO(result.getString(1), result.getString(2), result.getBigDecimal(3), result.getInt(4));
+        }
+        return null;
+    }
+
+    public static ArrayList<String> getAllItemCodes() throws SQLException, ClassNotFoundException {
+        ResultSet result = CrudUtil.execute("SELECT code FROM Item");
+        ArrayList<String> ItemCOdes = new ArrayList<>();
+
+        while (result.next()) {
+            ItemCOdes.add(result.getString(1));
+        }
+        return ItemCOdes;
+    }
+
+
 }
