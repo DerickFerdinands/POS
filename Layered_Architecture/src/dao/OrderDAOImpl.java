@@ -7,18 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class OrderDAOImpl {
+public class OrderDAOImpl implements  OrderDAO{
 
 
-    public static boolean saveOrder(String orderId, Date orderDate, String customerId) throws SQLException, ClassNotFoundException {
+    public  boolean saveOrder(String orderId, Date orderDate, String customerId) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Orders (id, `date`, customerID) VALUES (?,?,?)",orderId,orderDate,customerId);
     }
 
-    public static boolean saveOrderDetails(String orderID, String itemCode, int qty, double unitPrice) throws SQLException, ClassNotFoundException {
+    public  boolean saveOrderDetails(String orderID, String itemCode, int qty, double unitPrice) throws SQLException, ClassNotFoundException {
         return  CrudUtil.execute("INSERT INTO OrderDetail (orderId, itemCode, qty, unitPrice) VALUES (?,?,?,?)",orderID,itemCode,qty,unitPrice);
     }
 
-    public static String getLastOrderId() throws SQLException, ClassNotFoundException {
+    public  String getLastOrderId() throws SQLException, ClassNotFoundException {
         ResultSet rst = CrudUtil.execute("SELECT id FROM Orders ORDER BY id DESC LIMIT 1;");
 
         return rst.next() ? String.format("O%01d", (Integer.parseInt(rst.getString("id").replace("O", "")) + 1)) : "O01";
