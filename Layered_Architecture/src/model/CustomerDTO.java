@@ -1,7 +1,5 @@
 package model;
 
-import dao.CustomerDTOInterface;
-
 import java.io.Serializable;
 
 /**
@@ -9,7 +7,7 @@ import java.io.Serializable;
  * @since : 0.1.0
  **/
 
-public class CustomerDTO implements Serializable, CustomerDTOInterface {
+public class CustomerDTO implements Serializable {
     private String id;
     private String name;
     private String address;
