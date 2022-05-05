@@ -52,11 +52,15 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
+    CrudDao<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
+    CrudDao<CustomerDTO,String> customerCRUDOperations = new CustomerDAOImpl();
+    OrderDAO OrderCRUDOperations = new OrderDAOImpl();
     private String orderId;
 
-    ItemDAO itemCrudOperations = new ItemDAOImpl();
-    CustomerDAO customerCRUDOperations = new CustomerDAOImpl();
-    OrderDAO OrderCRUDOperations = new OrderDAOImpl();
+    public void initializeTextFieldProperties(JFXTextField field) {
+        field.setEditable(false);
+        field.setFocusTraversable(false);
+    }
 
     public void initialize() throws SQLException, ClassNotFoundException {
 
@@ -84,14 +88,10 @@ public class PlaceOrderFormController {
         lblId.setText("Order ID: " + orderId);
         lblDate.setText(LocalDate.now().toString());
         btnPlaceOrder.setDisable(true);
-        txtCustomerName.setFocusTraversable(false);
-        txtCustomerName.setEditable(false);
-        txtDescription.setFocusTraversable(false);
-        txtDescription.setEditable(false);
-        txtUnitPrice.setFocusTraversable(false);
-        txtUnitPrice.setEditable(false);
-        txtQtyOnHand.setFocusTraversable(false);
-        txtQtyOnHand.setEditable(false);
+        initializeTextFieldProperties(txtCustomerName);
+        initializeTextFieldProperties(txtDescription);
+        initializeTextFieldProperties(txtUnitPrice);
+        initializeTextFieldProperties(txtQtyOnHand);
         txtQty.setOnAction(event -> btnSave.fire());
         txtQty.setEditable(false);
         btnSave.setDisable(true);
@@ -102,22 +102,17 @@ public class PlaceOrderFormController {
             if (newValue != null) {
                 try {
                     /*Search Customer*/
-                    Connection connection = DBConnection.getDbConnection().getConnection();
                     try {
                         if (!existCustomer(newValue + "")) {
 //                            "There is no such customer associated with the id " + id
                             new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + newValue + "").show();
                         }
-
-                        CustomerDTO customerDTO = customerCRUDOperations.getCustomer(newValue);
-
+                        CustomerDTO customerDTO = customerCRUDOperations.get(newValue);
                         txtCustomerName.setText(customerDTO.getName());
                     } catch (SQLException e) {
                         new Alert(Alert.AlertType.ERROR, "Failed to find the customer " + newValue + "" + e).show();
                     }
 
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -139,7 +134,7 @@ public class PlaceOrderFormController {
 //                        throw new NotFoundException("There is no such item associated with the id " + code);
                     }
 
-                    ItemDTO item = itemCrudOperations.getItem(newItemCode);
+                    ItemDTO item = itemCrudOperations.get(newItemCode);
 
                     txtDescription.setText(item.getDescription());
                     txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
@@ -184,11 +179,11 @@ public class PlaceOrderFormController {
     }
 
     private boolean existItem(String code) throws SQLException, ClassNotFoundException {
-        return itemCrudOperations.itemExists(code);
+        return itemCrudOperations.exists(code);
     }
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.CustomerExists(id);
+        return customerCRUDOperations.exists(id);
     }
 
     public String generateNewOrderId() {
@@ -204,7 +199,7 @@ public class PlaceOrderFormController {
 
     private void loadAllCustomerIds() {
         try {
-            cmbCustomerId.getItems().addAll(customerCRUDOperations.getAllCustomerIds());
+            cmbCustomerId.getItems().addAll(customerCRUDOperations.getAllIds());
         } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to load customer ids").show();
 
@@ -214,7 +209,7 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            cmbItemCode.getItems().addAll(itemCrudOperations.getAllItemCodes());
+            cmbItemCode.getItems().addAll(itemCrudOperations.getAllIds());
         } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
 
@@ -334,7 +329,7 @@ public class PlaceOrderFormController {
                 ItemDTO item = findItem(detail.getItemCode());
                 item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
-                if (!(itemCrudOperations.updateItem(item.getDescription(), item.getUnitPrice(), item.getQtyOnHand(), item.getCode()))) {
+                if (!(itemCrudOperations.update(new ItemDTO(item.getCode(),item.getDescription(), item.getUnitPrice(), item.getQtyOnHand())))) {
                     connection.rollback();
                     connection.setAutoCommit(true);
                     return false;
@@ -354,7 +349,7 @@ public class PlaceOrderFormController {
 
     public ItemDTO findItem(String code) {
         try {
-            return itemCrudOperations.getItem(code);
+            return itemCrudOperations.get(code);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to find the Item " + code, e);
         }
