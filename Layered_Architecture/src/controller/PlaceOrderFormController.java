@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerDTO;
 import model.ItemDTO;
+import model.OrderDTO;
 import model.OrderDetailDTO;
 import view.tdm.OrderDetailTM;
 
@@ -54,7 +55,8 @@ public class PlaceOrderFormController {
     public Label lblTotal;
     CrudDao<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
     CrudDao<CustomerDTO,String> customerCRUDOperations = new CustomerDAOImpl();
-    OrderDAO OrderCRUDOperations = new OrderDAOImpl();
+    CrudDao<OrderDTO,String> OrderCRUDOperations = new OrderDAOImpl();
+    CrudDao<OrderDetailDTO,String> OrderDetailCRUDOperations = new OrderDetailDAOImpl();
     private String orderId;
 
     public void initializeTextFieldProperties(JFXTextField field) {
@@ -188,7 +190,7 @@ public class PlaceOrderFormController {
 
     public String generateNewOrderId() {
         try {
-            return OrderCRUDOperations.getLastOrderId();
+            return OrderCRUDOperations.getLastID();
         } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
 
@@ -285,7 +287,7 @@ public class PlaceOrderFormController {
     public void btnPlaceOrder_OnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
         System.out.println(orderId);
         boolean b = saveOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(),
-                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
+                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO("",tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
 
         if (b) {
             new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
@@ -309,7 +311,7 @@ public class PlaceOrderFormController {
 
             connection.setAutoCommit(false);
 
-            if (!OrderCRUDOperations.saveOrder(orderId, Date.valueOf(orderDate), customerId)) {
+            if (!OrderCRUDOperations.save(new OrderDTO(orderId, orderDate, customerId,"",BigDecimal.valueOf(100)))) {
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;
@@ -319,7 +321,7 @@ public class PlaceOrderFormController {
             for (OrderDetailDTO detail : orderDetails) {
 
 
-                if (!OrderCRUDOperations.saveOrderDetails(orderId, detail.getItemCode(), detail.getQty(), Double.valueOf(detail.getUnitPrice() + ""))) {
+                if (!OrderDetailCRUDOperations.save(new OrderDetailDTO(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
                     connection.rollback();
                     connection.setAutoCommit(true);
                     return false;

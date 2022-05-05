@@ -9,6 +9,7 @@ import java.math.BigDecimal;
  **/
 
 public class OrderDetailDTO implements Serializable {
+    private String orderID;
     private String itemCode;
     private int qty;
     private BigDecimal unitPrice;
@@ -16,7 +17,16 @@ public class OrderDetailDTO implements Serializable {
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(String itemCode, int qty, BigDecimal unitPrice) {
+    public String getOrderID() {
+        return orderID;
+    }
+
+    public void setOrderID(String orderID) {
+        this.orderID = orderID;
+    }
+
+    public OrderDetailDTO(String orderID, String itemCode, int qty, BigDecimal unitPrice) {
+        this.orderID = orderID;
         this.itemCode = itemCode;
         this.qty = qty;
         this.unitPrice = unitPrice;
