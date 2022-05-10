@@ -3,7 +3,8 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import dao.CrudDao;
-import dao.CustomerDAOImpl;
+import dao.Custom.CustomerDAO;
+import dao.Custom.Impl.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,7 +22,7 @@ import view.tdm.CustomerTM;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +40,7 @@ public class ManageCustomersFormController {
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
 
-    CrudDao<CustomerDTO,String> customerCRUDOperations = new CustomerDAOImpl();
+    CustomerDAO<CustomerDTO,String> customerCRUDOperations = new CustomerDAOImpl();
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));

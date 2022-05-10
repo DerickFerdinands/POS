@@ -3,7 +3,8 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import dao.CrudDao;
-import dao.ItemDAOImpl;
+import dao.Custom.Impl.*;
+import dao.Custom.ItemDAO;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,7 +43,7 @@ public class ManageItemsFormController {
     public JFXButton btnAddNewItem;
 
 
-    CrudDao<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
+    ItemDAO<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
         tblItems.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("description"));

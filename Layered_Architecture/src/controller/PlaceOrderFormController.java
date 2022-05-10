@@ -1,9 +1,14 @@
 package controller;
 
+import bo.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import dao.*;
+import dao.CrudDao;
+import dao.Custom.CustomerDAO;
+import dao.Custom.ItemDAO;
+import dao.Custom.OrderDAO;
+import dao.Custom.OrderDetailDAO;
 import db.DBConnection;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -22,11 +27,13 @@ import model.ItemDTO;
 import model.OrderDTO;
 import model.OrderDetailDTO;
 import view.tdm.OrderDetailTM;
+import dao.Custom.Impl.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -53,10 +60,8 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
-    CrudDao<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
-    CrudDao<CustomerDTO,String> customerCRUDOperations = new CustomerDAOImpl();
-    CrudDao<OrderDTO,String> OrderCRUDOperations = new OrderDAOImpl();
-    CrudDao<OrderDetailDTO,String> OrderDetailCRUDOperations = new OrderDetailDAOImpl();
+
+    PurchaseOrderBOImpl boImpl = new PurchaseOrderBOImpl();
     private String orderId;
 
     public void initializeTextFieldProperties(JFXTextField field) {
@@ -86,7 +91,7 @@ public class PlaceOrderFormController {
             return new ReadOnlyObjectWrapper<>(btnDelete);
         });
 
-        orderId = generateNewOrderId();
+        orderId = boImpl.generateNewOrderId();
         lblId.setText("Order ID: " + orderId);
         lblDate.setText(LocalDate.now().toString());
         btnPlaceOrder.setDisable(true);
@@ -105,12 +110,11 @@ public class PlaceOrderFormController {
                 try {
                     /*Search Customer*/
                     try {
-                        if (!existCustomer(newValue + "")) {
+                        if (!boImpl.existCustomer(newValue + "")) {
 //                            "There is no such customer associated with the id " + id
                             new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + newValue + "").show();
                         }
-                        CustomerDTO customerDTO = customerCRUDOperations.get(newValue);
-                        txtCustomerName.setText(customerDTO.getName());
+                        txtCustomerName.setText(boImpl.getCustomer(newValue).getName());
                     } catch (SQLException e) {
                         new Alert(Alert.AlertType.ERROR, "Failed to find the customer " + newValue + "" + e).show();
                     }
@@ -132,11 +136,11 @@ public class PlaceOrderFormController {
 
                 /*Find Item*/
                 try {
-                    if (!existItem(newItemCode + "")) {
+                    if (!boImpl.existItem(newItemCode + "")) {
 //                        throw new NotFoundException("There is no such item associated with the id " + code);
                     }
 
-                    ItemDTO item = itemCrudOperations.get(newItemCode);
+                    ItemDTO item = boImpl.getItem(newItemCode);
 
                     txtDescription.setText(item.getDescription());
                     txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
@@ -176,47 +180,10 @@ public class PlaceOrderFormController {
 
         });
 
-        loadAllCustomerIds();
-        loadAllItemCodes();
+        boImpl.loadAllCustomerIds(cmbCustomerId);
+        boImpl.loadAllItemCodes(cmbItemCode);
     }
 
-    private boolean existItem(String code) throws SQLException, ClassNotFoundException {
-        return itemCrudOperations.exists(code);
-    }
-
-    boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.exists(id);
-    }
-
-    public String generateNewOrderId() {
-        try {
-            return OrderCRUDOperations.getLastID();
-        } catch (SQLException | ClassNotFoundException e) {
-            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
-
-        }
-        return null;
-
-    }
-
-    private void loadAllCustomerIds() {
-        try {
-            cmbCustomerId.getItems().addAll(customerCRUDOperations.getAllIds());
-        } catch (SQLException | ClassNotFoundException e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to load customer ids").show();
-
-        }
-    }
-
-    private void loadAllItemCodes() {
-        try {
-            /*Get all items*/
-            cmbItemCode.getItems().addAll(itemCrudOperations.getAllIds());
-        } catch (SQLException | ClassNotFoundException e) {
-            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
-
-        }
-    }
 
     @FXML
     private void navigateToHome(MouseEvent event) throws IOException {
@@ -285,76 +252,20 @@ public class PlaceOrderFormController {
     }
 
     public void btnPlaceOrder_OnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
-        System.out.println(orderId);
-        boolean b = saveOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(),
-                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO("",tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
 
-        if (b) {
+        if (boImpl.purchaseOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(), tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO("", tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()))) {
             new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
         } else {
             new Alert(Alert.AlertType.ERROR, "Order has not been placed successfully").show();
         }
 
-        orderId = generateNewOrderId();
+        orderId = boImpl.generateNewOrderId();
         lblId.setText("Order Id: " + orderId);
         cmbCustomerId.getSelectionModel().clearSelection();
         cmbItemCode.getSelectionModel().clearSelection();
         tblOrderDetails.getItems().clear();
         txtQty.clear();
         calculateTotal();
-    }
-
-    public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException {
-        /*Transaction*/
-        Connection connection = DBConnection.getDbConnection().getConnection();
-        try {
-
-            connection.setAutoCommit(false);
-
-            if (!OrderCRUDOperations.save(new OrderDTO(orderId, orderDate, customerId,"",BigDecimal.valueOf(100)))) {
-                connection.rollback();
-                connection.setAutoCommit(true);
-                return false;
-            }
-
-
-            for (OrderDetailDTO detail : orderDetails) {
-
-
-                if (!OrderDetailCRUDOperations.save(new OrderDetailDTO(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
-
-//                //Search & Update Item
-                ItemDTO item = findItem(detail.getItemCode());
-                item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
-
-                if (!(itemCrudOperations.update(new ItemDTO(item.getCode(),item.getDescription(), item.getUnitPrice(), item.getQtyOnHand())))) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
-            }
-
-            connection.commit();
-            connection.setAutoCommit(true);
-            return true;
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-    public ItemDTO findItem(String code) {
-        try {
-            return itemCrudOperations.get(code);
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to find the Item " + code, e);
-        }
     }
 
 
