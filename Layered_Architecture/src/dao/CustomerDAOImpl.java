@@ -1,17 +1,13 @@
 package dao;
 
 import Util.CrudUtil;
-import db.DBConnection;
-import javafx.scene.control.Alert;
 import model.CustomerDTO;
-import view.tdm.CustomerTM;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-public class CustomerDAOImpl implements CrudDao<CustomerDTO, String> {
+public class CustomerDAOImpl implements CustomerDAO<CustomerDTO,String> {
+
     @Override
     public boolean save(CustomerDTO o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Customer (id,name, address) VALUES (?,?,?)", o.getId(), o.getName(), o.getAddress());
@@ -81,4 +77,8 @@ public class CustomerDAOImpl implements CrudDao<CustomerDTO, String> {
         return result.next() ? new CustomerDTO(result.getString(1), result.getString(2), result.getString(3)) : null;
     }
 
+    @Override
+    public String getAddress() {
+        return null;
+    }
 }
