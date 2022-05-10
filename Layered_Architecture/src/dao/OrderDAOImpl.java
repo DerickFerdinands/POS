@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class OrderDAOImpl implements CrudDao<OrderDTO, String> {
+public class OrderDAOImpl implements OrderDAO<OrderDTO, String> {
     @Override
     public boolean save(OrderDTO o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Orders (id, `date`, customerID) VALUES (?,?,?)", o.getOrderId(), o.getOrderDate(), o.getCustomerId());

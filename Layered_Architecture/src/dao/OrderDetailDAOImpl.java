@@ -2,11 +2,10 @@ package dao;
 
 import Util.CrudUtil;
 import model.OrderDetailDTO;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class OrderDetailDAOImpl implements CrudDao<OrderDetailDTO,String>{
+public class OrderDetailDAOImpl implements OrderDetailDAO<OrderDetailDTO,String>{
     @Override
     public boolean save(OrderDetailDTO o) throws SQLException, ClassNotFoundException {
         return  CrudUtil.execute("INSERT INTO OrderDetail (orderId, itemCode, qty, unitPrice) VALUES (?,?,?,?)",o.getOrderID(),o.getItemCode(),o.getQty(),o.getUnitPrice());
