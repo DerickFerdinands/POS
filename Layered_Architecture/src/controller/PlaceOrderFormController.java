@@ -1,5 +1,6 @@
 package controller;
 
+import bo.PurchaseOptions;
 import bo.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -61,12 +62,14 @@ public class PlaceOrderFormController {
     public Label lblDate;
     public Label lblTotal;
 
-    PurchaseOrderBOImpl boImpl = new PurchaseOrderBOImpl();
+    PurchaseOptions boImpl = new PurchaseOrderBOImpl();
     private String orderId;
 
-    public void initializeTextFieldProperties(JFXTextField field) {
-        field.setEditable(false);
-        field.setFocusTraversable(false);
+    public void initializeTextFieldProperties(JFXTextField... fields) {
+        for(JFXTextField field: fields) {
+            field.setEditable(false);
+            field.setFocusTraversable(false);
+        }
     }
 
     public void initialize() throws SQLException, ClassNotFoundException {
@@ -95,10 +98,7 @@ public class PlaceOrderFormController {
         lblId.setText("Order ID: " + orderId);
         lblDate.setText(LocalDate.now().toString());
         btnPlaceOrder.setDisable(true);
-        initializeTextFieldProperties(txtCustomerName);
-        initializeTextFieldProperties(txtDescription);
-        initializeTextFieldProperties(txtUnitPrice);
-        initializeTextFieldProperties(txtQtyOnHand);
+        initializeTextFieldProperties(txtCustomerName,txtDescription,txtUnitPrice,txtQtyOnHand);
         txtQty.setOnAction(event -> btnSave.fire());
         txtQty.setEditable(false);
         btnSave.setDisable(true);
