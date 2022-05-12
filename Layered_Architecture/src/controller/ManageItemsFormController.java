@@ -44,8 +44,8 @@ public class ManageItemsFormController {
     public JFXTextField txtUnitPrice;
     public JFXButton btnAddNewItem;
 
-        ItemOptions ItemBO = new ItemBOImpl();
-//    ItemDAO<ItemDTO,String> itemCrudOperations = new ItemDAOImpl();
+    private final ItemOptions ItemBO = new ItemBOImpl();
+
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
         tblItems.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -178,7 +178,7 @@ public class ManageItemsFormController {
             try {
                 if (existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
-                }else {
+                } else {
                     //Save Item
                     ItemBO.saveItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
                     loadAllItems();
@@ -195,7 +195,7 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
                 /*Update Item*/
-                ItemBO.updateItem(new ItemDTO(code,description, unitPrice, qtyOnHand));
+                ItemBO.updateItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
 
                 ItemTM selectedItem = tblItems.getSelectionModel().getSelectedItem();
                 selectedItem.setDescription(description);
