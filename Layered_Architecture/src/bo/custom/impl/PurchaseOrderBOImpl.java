@@ -2,10 +2,9 @@ package bo.custom.impl;
 
 import bo.custom.PurchaseOptions;
 import com.jfoenix.controls.JFXComboBox;
-import dao.Custom.CustomerDAO;
-import dao.Custom.ItemDAO;
-import dao.Custom.OrderDAO;
-import dao.Custom.OrderDetailDAO;
+import dao.CrudDao;
+import dao.Custom.*;
+import dao.DAOFactory;
 import db.DBConnection;
 import model.CustomerDTO;
 import model.ItemDTO;
@@ -21,72 +20,81 @@ import java.util.List;
 
 public class PurchaseOrderBOImpl implements PurchaseOptions {
 
-    private final ItemDAO<ItemDTO, String> itemCrudOperations = new ItemDAOImpl();
-    private final CustomerDAO<CustomerDTO, String> customerCRUDOperations = new CustomerDAOImpl();
-    private final OrderDAO<OrderDTO, String> OrderCRUDOperations = new OrderDAOImpl();
-    private final OrderDetailDAO<OrderDetailDTO, String> OrderDetailCRUDOperations = new OrderDetailDAOImpl();
+    DAOFactory factory = DAOFactory.getDAOFactoryInstance();
+    private final ItemDAO<ItemDTO, String> itemCrudOperations = (ItemDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ITEM);
+    private final CustomerDAO<CustomerDTO, String> customerCRUDOperations = (CustomerDAOImpl) factory.getDAO(DAOFactory.DAOTypes.CUSTOMER);
+    private final OrderDAO<OrderDTO, String> OrderCRUDOperations = (OrderDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ORDER);
+    private final OrderDetailDAO<OrderDetailDTO, String> OrderDetailCRUDOperations = (OrderDetailDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ORDERDETAILS);
+    private final QueryDAO joinQueryOps = (QueryDAOimpl) factory.getDAO(DAOFactory.DAOTypes.QUERYDAO);
 
     @Override
     public boolean purchaseOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
-            connection.setAutoCommit(false);
+        connection.setAutoCommit(false);
 
-            if (!OrderCRUDOperations.save(new OrderDTO(orderId, orderDate, customerId, "", BigDecimal.valueOf(100)))) {
+        if (!OrderCRUDOperations.save(new OrderDTO(orderId, orderDate, customerId, "", BigDecimal.valueOf(100)))) {
+            connection.rollback();
+            connection.setAutoCommit(true);
+            return false;
+        }
+
+
+        for (OrderDetailDTO detail : orderDetails) {
+
+
+            if (!OrderDetailCRUDOperations.save(new OrderDetailDTO(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;
             }
 
-
-            for (OrderDetailDTO detail : orderDetails) {
-
-
-                if (!OrderDetailCRUDOperations.save(new OrderDetailDTO(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
-
 //                //Search & Update Item
-                ItemDTO item = itemCrudOperations.get(detail.getItemCode());
-                item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
+            ItemDTO item = itemCrudOperations.get(detail.getItemCode());
+            item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
-                if (!(itemCrudOperations.update(new ItemDTO(item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand())))) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
+            if (!(itemCrudOperations.update(new ItemDTO(item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand())))) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+                return false;
             }
+        }
 
-            connection.commit();
-            connection.setAutoCommit(true);
-            return true;
+        connection.commit();
+        connection.setAutoCommit(true);
+        return true;
 
     }
+
     @Override
     public boolean existItem(String code) throws SQLException, ClassNotFoundException {
         return itemCrudOperations.exists(code);
     }
+
     @Override
     public boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
         return customerCRUDOperations.exists(id);
     }
+
     @Override
     public String generateNewOrderId() throws SQLException, ClassNotFoundException {
-            return OrderCRUDOperations.getLastID();
+        return OrderCRUDOperations.getLastID();
     }
+
     @Override
     public void loadAllCustomerIds(JFXComboBox cmbCustomerId) throws SQLException, ClassNotFoundException {
-            cmbCustomerId.getItems().addAll(customerCRUDOperations.getAllIds());
+        cmbCustomerId.getItems().addAll(customerCRUDOperations.getAllIds());
     }
+
     @Override
     public void loadAllItemCodes(JFXComboBox cmbItemCode) throws SQLException, ClassNotFoundException {
-            cmbItemCode.getItems().addAll(itemCrudOperations.getAllIds());
+        cmbItemCode.getItems().addAll(itemCrudOperations.getAllIds());
     }
+
     @Override
     public CustomerDTO getCustomer(String id) throws SQLException, ClassNotFoundException {
         return customerCRUDOperations.get(id);
     }
+
     @Override
     public ItemDTO getItem(String id) throws SQLException, ClassNotFoundException {
         return itemCrudOperations.get(id);

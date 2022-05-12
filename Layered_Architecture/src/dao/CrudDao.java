@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public interface CrudDao<T,ID>   {
+public interface CrudDao<T,ID>  extends SuperDAO  {
 
     boolean save(T o) throws SQLException, ClassNotFoundException;
 
