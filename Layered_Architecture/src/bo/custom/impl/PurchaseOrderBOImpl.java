@@ -1,12 +1,12 @@
-package bo;
+package bo.custom.impl;
 
+import bo.custom.PurchaseOptions;
 import com.jfoenix.controls.JFXComboBox;
 import dao.Custom.CustomerDAO;
 import dao.Custom.ItemDAO;
 import dao.Custom.OrderDAO;
 import dao.Custom.OrderDetailDAO;
 import db.DBConnection;
-import javafx.scene.control.Alert;
 import model.CustomerDTO;
 import model.ItemDTO;
 import model.OrderDTO;

@@ -1,4 +1,4 @@
-package bo;
+package bo.custom;
 
 import com.jfoenix.controls.JFXComboBox;
 import db.DBConnection;
