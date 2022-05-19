@@ -4,6 +4,7 @@ import bo.custom.CustomerOptions;
 import dao.Custom.CustomerDAO;
 import dao.Custom.Impl.*;
 import dao.DAOFactory;
+import entity.Customer;
 import model.CustomerDTO;
 
 import java.sql.SQLException;
@@ -14,17 +15,21 @@ public class CustomerBOImpl implements CustomerOptions {
 
     @Override
     public ArrayList<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.getAll();
+        ArrayList<CustomerDTO> cusList = new ArrayList<>();
+        for (Customer c : customerCRUDOperations.getAll()){
+            cusList.add(new CustomerDTO(c.getId(),c.getName(),c.getAddress()));
+        }
+        return cusList;
     }
 
     @Override
     public boolean saveCustomer(CustomerDTO c) throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.save(c);
+        return customerCRUDOperations.save(new Customer(c.getId(),c.getName(),c.getAddress()));
     }
 
     @Override
     public boolean updateCustomer(CustomerDTO c) throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.update(c);
+        return customerCRUDOperations.update(new Customer(c.getId(),c.getName(),c.getAddress()));
     }
 
     @Override

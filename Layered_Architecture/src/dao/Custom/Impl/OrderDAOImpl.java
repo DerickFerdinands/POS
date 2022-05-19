@@ -2,7 +2,7 @@ package dao.Custom.Impl;
 
 import dao.Custom.OrderDAO;
 import Util.CrudUtil;
-import model.OrderDTO;
+import entity.Orders;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,17 +10,17 @@ import java.util.ArrayList;
 
 public class OrderDAOImpl implements OrderDAO {
     @Override
-    public boolean save(OrderDTO o) throws SQLException, ClassNotFoundException {
-        return CrudUtil.execute("INSERT INTO Orders (id, `date`, customerID) VALUES (?,?,?)", o.getOrderId(), o.getOrderDate(), o.getCustomerId());
+    public boolean save(Orders o) throws SQLException, ClassNotFoundException {
+        return CrudUtil.execute("INSERT INTO Orders (id, `date`, customerID) VALUES (?,?,?)", o.getOid(), o.getDate(), o.getCustomerID());
     }
 
     @Override
-    public ArrayList<OrderDTO> getAll() throws SQLException, ClassNotFoundException {
+    public ArrayList<Orders> getAll() throws SQLException, ClassNotFoundException {
         return null;
     }
 
     @Override
-    public boolean update(OrderDTO o) throws SQLException, ClassNotFoundException {
+    public boolean update(Orders o) throws SQLException, ClassNotFoundException {
         return false;
     }
 
@@ -51,7 +51,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public OrderDTO get(String s) throws SQLException, ClassNotFoundException {
+    public Orders get(String s) throws SQLException, ClassNotFoundException {
         return null;
     }
 

@@ -2,7 +2,7 @@ package dao.Custom.Impl;
 
 import dao.Custom.ItemDAO;
 import Util.CrudUtil;
-import model.ItemDTO;
+import entity.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,22 +10,22 @@ import java.util.ArrayList;
 
 public class ItemDAOImpl implements ItemDAO {
     @Override
-    public boolean save(ItemDTO o) throws SQLException, ClassNotFoundException {
+    public boolean save(Item o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)", o.getCode(), o.getDescription(), o.getUnitPrice(), o.getQtyOnHand());
     }
 
     @Override
-    public ArrayList<ItemDTO> getAll() throws SQLException, ClassNotFoundException {
+    public ArrayList<Item> getAll() throws SQLException, ClassNotFoundException {
         ResultSet result = CrudUtil.execute("SELECT * FROM Item");
-        ArrayList<ItemDTO> ItemList = new ArrayList<>();
+        ArrayList<Item> ItemList = new ArrayList<>();
         while (result.next()) {
-            ItemList.add(new ItemDTO(result.getString(1), result.getString(2), result.getBigDecimal(3), result.getInt(4)));
+            ItemList.add(new Item(result.getString(1), result.getString(2), result.getInt(4), result.getBigDecimal(3)));
         }
         return ItemList;
     }
 
     @Override
-    public boolean update(ItemDTO o) throws SQLException, ClassNotFoundException {
+    public boolean update(Item o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?", o.getDescription(), o.getUnitPrice(), o.getQtyOnHand(), o.getCode());
     }
 
@@ -69,10 +69,10 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public ItemDTO get(String s) throws SQLException, ClassNotFoundException {
+    public Item get(String s) throws SQLException, ClassNotFoundException {
         ResultSet result = CrudUtil.execute("SELECT * FROM Item WHERE code=?", s);
         if (result.next()) {
-            return new ItemDTO(result.getString(1), result.getString(2), result.getBigDecimal(3), result.getInt(4));
+            return new Item(result.getString(1), result.getString(2),result.getInt(4), result.getBigDecimal(3));
         }
         return null;
     }

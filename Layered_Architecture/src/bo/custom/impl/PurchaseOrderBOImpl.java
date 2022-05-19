@@ -6,6 +6,10 @@ import dao.CrudDao;
 import dao.Custom.*;
 import dao.DAOFactory;
 import db.DBConnection;
+import entity.Customer;
+import entity.Item;
+import entity.OrderDetails;
+import entity.Orders;
 import model.CustomerDTO;
 import model.ItemDTO;
 import model.OrderDTO;
@@ -32,7 +36,7 @@ public class PurchaseOrderBOImpl implements PurchaseOptions {
         Connection connection = DBConnection.getDbConnection().getConnection();
         connection.setAutoCommit(false);
 
-        if (!OrderCRUDOperations.save(new OrderDTO(orderId, orderDate, customerId, "", BigDecimal.valueOf(100)))) {
+        if (!OrderCRUDOperations.save(new Orders(orderId, orderDate, customerId))) {
             connection.rollback();
             connection.setAutoCommit(true);
             return false;
@@ -42,17 +46,17 @@ public class PurchaseOrderBOImpl implements PurchaseOptions {
         for (OrderDetailDTO detail : orderDetails) {
 
 
-            if (!OrderDetailCRUDOperations.save(new OrderDetailDTO(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
+            if (!OrderDetailCRUDOperations.save(new OrderDetails(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;
             }
 
 //                //Search & Update Item
-            ItemDTO item = itemCrudOperations.get(detail.getItemCode());
+            Item item = itemCrudOperations.get(detail.getItemCode());
             item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
-            if (!(itemCrudOperations.update(new ItemDTO(item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand())))) {
+            if (!(itemCrudOperations.update(item))){
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;
@@ -92,11 +96,13 @@ public class PurchaseOrderBOImpl implements PurchaseOptions {
 
     @Override
     public CustomerDTO getCustomer(String id) throws SQLException, ClassNotFoundException {
-        return customerCRUDOperations.get(id);
+        Customer customer = customerCRUDOperations.get(id);
+        return new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress());
     }
 
     @Override
     public ItemDTO getItem(String id) throws SQLException, ClassNotFoundException {
-        return itemCrudOperations.get(id);
+        Item item = itemCrudOperations.get(id);
+        return new ItemDTO(item.getCode(),item.getDescription(),item.getUnitPrice(),item.getQtyOnHand());
     }
 }

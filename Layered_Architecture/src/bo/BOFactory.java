@@ -1,5 +1,6 @@
-package bo.custom;
+package bo;
 
+import bo.custom.SuperBO;
 import bo.custom.impl.CustomerBOImpl;
 import bo.custom.impl.ItemBOImpl;
 import bo.custom.impl.PurchaseOrderBOImpl;
