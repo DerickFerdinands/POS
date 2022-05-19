@@ -5,7 +5,7 @@ import model.CustomerDTO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public interface CustomerOptions {
+public interface CustomerOptions extends SuperBO {
     ArrayList<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException;
 
     boolean saveCustomer(CustomerDTO c) throws SQLException, ClassNotFoundException;

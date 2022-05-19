@@ -1,8 +1,9 @@
 package dao.Custom;
 
 import dao.CrudDao;
+import model.CustomerDTO;
 
-public interface CustomerDAO<T,ID> extends CrudDao<T,ID> {
+public interface CustomerDAO extends CrudDao<CustomerDTO,String> {
 
     String getAddress();
 }

@@ -7,7 +7,7 @@ import model.CustomerDTO;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class CustomerDAOImpl implements CustomerDAO<CustomerDTO,String> {
+public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public boolean save(CustomerDTO o) throws SQLException, ClassNotFoundException {

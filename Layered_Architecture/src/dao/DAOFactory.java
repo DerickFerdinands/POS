@@ -13,19 +13,7 @@ import model.OrderDetailDTO;
 public class DAOFactory {
     private static DAOFactory daoFactory;
 
-    private final ItemDAO<ItemDTO, String> itemCrudOperations;
-    private final CustomerDAO<CustomerDTO, String> customerCRUDOperations;
-    private final OrderDAO<OrderDTO, String> OrderCRUDOperations;
-    private final OrderDetailDAO<OrderDetailDTO, String> OrderDetailCRUDOperations;
-    private final QueryDAOimpl queryDAO;
-
     private DAOFactory() {
-        daoFactory = new DAOFactory();
-        itemCrudOperations = new ItemDAOImpl();
-        customerCRUDOperations = new CustomerDAOImpl();
-        OrderCRUDOperations = new OrderDAOImpl();
-        OrderDetailCRUDOperations = new OrderDetailDAOImpl();
-        queryDAO = new QueryDAOimpl();
     }
 
     public static DAOFactory getDAOFactoryInstance() {
@@ -35,16 +23,17 @@ public class DAOFactory {
     public SuperDAO getDAO(DAOTypes types) {
         switch (types) {
             case CUSTOMER:
-                return  customerCRUDOperations;
-            case ITEM:
-                return  itemCrudOperations;
+                return new CustomerDAOImpl();
             case ORDER:
-                return  OrderCRUDOperations;
+                return new OrderDAOImpl();
             case ORDERDETAILS:
-                return  OrderDetailCRUDOperations;
+                return new OrderDetailDAOImpl();
             case QUERYDAO:
-                return  queryDAO;
-            default:return null;
+                return new QueryDAOimpl();
+            case ITEM:
+                return new ItemDAOImpl();
+            default:
+                return null;
         }
     }
 

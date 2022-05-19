@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ItemBOImpl implements ItemOptions {
-    ItemDAO<ItemDTO, String> itemCrudOperations = (ItemDAOImpl)DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.ITEM);
+    ItemDAO itemCrudOperations = (ItemDAOImpl)DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.ITEM);
 
     @Override
     public ArrayList<ItemDTO> getALlItems() throws SQLException, ClassNotFoundException {

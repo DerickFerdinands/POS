@@ -20,12 +20,12 @@ import java.util.List;
 
 public class PurchaseOrderBOImpl implements PurchaseOptions {
 
-    DAOFactory factory = DAOFactory.getDAOFactoryInstance();
-    private final ItemDAO<ItemDTO, String> itemCrudOperations = (ItemDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ITEM);
-    private final CustomerDAO<CustomerDTO, String> customerCRUDOperations = (CustomerDAOImpl) factory.getDAO(DAOFactory.DAOTypes.CUSTOMER);
-    private final OrderDAO<OrderDTO, String> OrderCRUDOperations = (OrderDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ORDER);
-    private final OrderDetailDAO<OrderDetailDTO, String> OrderDetailCRUDOperations = (OrderDetailDAOImpl) factory.getDAO(DAOFactory.DAOTypes.ORDERDETAILS);
-    private final QueryDAO joinQueryOps = (QueryDAOimpl) factory.getDAO(DAOFactory.DAOTypes.QUERYDAO);
+
+    private final ItemDAO itemCrudOperations = (ItemDAOImpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.ITEM);
+    private final CustomerDAO customerCRUDOperations = (CustomerDAOImpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.CUSTOMER);
+    private final OrderDAO OrderCRUDOperations = (OrderDAOImpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.ORDER);
+    private final OrderDetailDAO OrderDetailCRUDOperations = (OrderDetailDAOImpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.ORDERDETAILS);
+    private final QueryDAO joinQueryOps = (QueryDAOimpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.QUERYDAO);
 
     @Override
     public boolean purchaseOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException {

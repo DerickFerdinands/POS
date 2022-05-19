@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class OrderDAOImpl implements OrderDAO<OrderDTO, String> {
+public class OrderDAOImpl implements OrderDAO {
     @Override
     public boolean save(OrderDTO o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Orders (id, `date`, customerID) VALUES (?,?,?)", o.getOrderId(), o.getOrderDate(), o.getCustomerId());

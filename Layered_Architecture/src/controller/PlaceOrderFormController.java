@@ -1,5 +1,6 @@
 package controller;
 
+import bo.custom.BOFactory;
 import bo.custom.PurchaseOptions;
 import bo.custom.impl.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
@@ -51,7 +52,7 @@ public class PlaceOrderFormController {
     public Label lblDate;
     public Label lblTotal;
 
-    PurchaseOptions boImpl = new PurchaseOrderBOImpl();
+    PurchaseOptions boImpl = (PurchaseOptions) BOFactory.getBOFactoryInstance().getBO(BOFactory.BOTypes.PURCHASE);
     private String orderId;
 
     public void initializeTextFieldProperties(JFXTextField... fields) {

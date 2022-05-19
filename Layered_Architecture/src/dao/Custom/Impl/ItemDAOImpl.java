@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ItemDAOImpl implements ItemDAO<ItemDTO, String> {
+public class ItemDAOImpl implements ItemDAO {
     @Override
     public boolean save(ItemDTO o) throws SQLException, ClassNotFoundException {
         return CrudUtil.execute("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)", o.getCode(), o.getDescription(), o.getUnitPrice(), o.getQtyOnHand());
