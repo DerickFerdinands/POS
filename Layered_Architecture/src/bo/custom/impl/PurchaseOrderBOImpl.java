@@ -2,7 +2,6 @@ package bo.custom.impl;
 
 import bo.custom.PurchaseOptions;
 import com.jfoenix.controls.JFXComboBox;
-import dao.CrudDao;
 import dao.Custom.*;
 import dao.DAOFactory;
 import db.DBConnection;
@@ -16,7 +15,6 @@ import model.OrderDTO;
 import model.OrderDetailDTO;
 import dao.Custom.Impl.*;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -32,21 +30,21 @@ public class PurchaseOrderBOImpl implements PurchaseOptions {
     private final QueryDAO joinQueryOps = (QueryDAOimpl) DAOFactory.getDAOFactoryInstance().getDAO(DAOFactory.DAOTypes.QUERYDAO);
 
     @Override
-    public boolean purchaseOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException {
+    public boolean purchaseOrder(OrderDTO dto) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         connection.setAutoCommit(false);
 
-        if (!OrderCRUDOperations.save(new Orders(orderId, orderDate, customerId))) {
+        if (!OrderCRUDOperations.save(new Orders(dto.getOrderId(), dto.getOrderDate(), dto.getCustomerId()))) {
             connection.rollback();
             connection.setAutoCommit(true);
             return false;
         }
 
 
-        for (OrderDetailDTO detail : orderDetails) {
+        for (OrderDetailDTO detail : dto.getOrderDetails()) {
 
 
-            if (!OrderDetailCRUDOperations.save(new OrderDetails(orderId, detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
+            if (!OrderDetailCRUDOperations.save(new OrderDetails(dto.getOrderId(), detail.getItemCode(), detail.getQty(), detail.getUnitPrice()))) {
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;

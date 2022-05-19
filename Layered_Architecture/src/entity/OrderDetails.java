@@ -2,10 +2,6 @@ package entity;
 
 import java.math.BigDecimal;
 
-/**
- * @author : Sanu Vithanage
- * @since : 0.1.0
- **/
 public class OrderDetails {
     private String oid;
     private String itemCode;

@@ -1,9 +1,5 @@
 package entity;
 
-/**
- * @author : Sanu Vithanage
- * @since : 0.1.0
- **/
 public class Customer {
     private String id;
     private String name;

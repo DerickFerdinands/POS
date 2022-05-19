@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface PurchaseOptions extends SuperBO{
-    boolean purchaseOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException;
+    boolean purchaseOrder(OrderDTO dto) throws SQLException, ClassNotFoundException;
 
     boolean existItem(String code) throws SQLException, ClassNotFoundException;
 
